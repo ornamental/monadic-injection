@@ -117,6 +117,32 @@ final class InjectionContext[F[_]: MonadCancelThrow, T <: HList] private (ctx: R
       implicit fnHlist: FnToProduct.Aux[M, I => Resource[F, A]],
       selector: SelectAllCovariant[T, I]): InjectionContext[F, A :: T] =
     InjectionContext(ctx >>= (c => fnHlist(f)(selector(c)).map(_ :: c)))
+
+  /**
+   * Collects all the context elements having the given type (subtypes included) to a list and
+   * adds the list to the context.
+   *
+   * @tparam A
+   *   the type whose instances to collect
+   */
+  def collect[A](implicit cc: CollectCovariant[T, A]): InjectionContext[F, List[A] :: T] =
+    collectMapping[List[A], A](identity)
+
+  /**
+   * Collects all the context elements having the given type (subtypes included) to a list and
+   * adds the result of a pure computation over the list to the context.
+   *
+   * @param mapping
+   *   the computation over the collected list yielding the value to add to the context
+   * @tparam A
+   *   the type whose instances to collect
+   * @tparam B
+   *   the type of element to be added to the context
+   */
+  def collectMapping[A, B](
+      mapping: List[B] => A
+  )(implicit cc: CollectCovariant[T, B]): InjectionContext[F, A :: T] = InjectionContext(
+    ctx.map(h => mapping(cc(h)) :: h))
 }
 
 object InjectionContext {
