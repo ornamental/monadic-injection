@@ -1,12 +1,13 @@
 # Compile-Time Dependency Injection in Monadic Context
 
-Applications frequently require values and resources created in monadic context to be used as dependencies in other components
-which in their turn are allocated in such context.
+Applications frequently require values and resources created in monadic context to be used as dependencies in other
+components which in their turn are allocated in such context.
 
-This is a `shapeless`-based tool allowing one to organize the creation of dependencies and their eventual usage in an effectful 
-computation.
+This is a `shapeless`-based tool allowing one to organize the creation of dependencies and their eventual usage in an
+effectful computation.
 
 _Example_ (`@@`-tagged types are provied by `supertagged`):
+
 ```scala
 final case class Configuration(
   port: Int @@ "service-port", 
